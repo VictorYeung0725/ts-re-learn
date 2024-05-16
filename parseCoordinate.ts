@@ -1,3 +1,4 @@
+//4
 interface Coordinate {
   x: number;
   y: number;

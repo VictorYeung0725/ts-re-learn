@@ -1,3 +1,5 @@
+//5
+
 //NOTE Optional parameter
 function printIngredient(quantity: string, ingredient: string, extra?: string) {
   console.log(`${quantity} ${ingredient} ${extra ? `${extra}` : ''}`);
