@@ -10,3 +10,23 @@ function add3DCoodinate(
 }
 
 console.log(add3DCoodinate([0, 0, 0], [10, 20, 30]));
+
+//Tuples with different type
+//NOTE React useState
+function simpleString(inital: string): [() => string, (v: string) => void] {
+  let str: string = inital;
+  return [
+    () => str,
+    (v: string) => {
+      str = v;
+    },
+  ];
+}
+
+const [str1getter, str1setter] = simpleString('hello');
+const [str2getter, str2setter] = simpleString('jack');
+console.log(str2getter());
+console.log(str1getter());
+str1setter('googleBy');
+console.log(str1getter());
+console.log(str2getter());
