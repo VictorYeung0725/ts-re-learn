@@ -1,7 +1,9 @@
-interface Databse {
-  get(id: string): string;
-  set(id: string, value: string): void;
+interface Databse<T, K> {
+  get(id: K): T;
+  set(id: K, value: T): void;
 }
+
+//also what if we make not only the value to generic but also the key to generic , <T , K> we can also provide a K
 
 interface Persistable {
   //you can read or write your state from string ?
@@ -9,20 +11,27 @@ interface Persistable {
   restoreFromString(storedState: string): void;
 }
 
-class InMemoryDatabase implements Databse {
+//why this compliant about dbType
+//NOTE here we create a dbType to solve that, but why ?
+type DBkeyType = string | number | symbol;
+class InMemoryDatabase<T, K extends DBkeyType> implements Databse<T, K> {
   // private db: Record<string, string> = {};
-  protected db: Record<string, string> = {};
-  get(id: string): string {
+  //NOTE here we need need to use type casting Record<K, T>???
+  protected db: Record<K, T> = {} as Record<K, T>;
+  get(id: K): T {
     return this.db[id];
   }
-  set(id: string, value: string): void {
+  set(id: K, value: T): void {
     this.db[id] = value;
   }
 }
 
 //now persistableMemoryDatabase get everything from inMemoryDatabse
 //NOTE here we also implement to make it assitable
-class PersistableMemoryDatabse extends InMemoryDatabase implements Persistable {
+class PersistableMemoryDatabse<T, K extends DBkeyType>
+  extends InMemoryDatabase<T, K>
+  implements Persistable
+{
   saveToString(): string {
     //BUG here we can not access DB
     //even though we already extends from inMemoryDatabse
@@ -33,6 +42,7 @@ class PersistableMemoryDatabse extends InMemoryDatabase implements Persistable {
     this.db = JSON.parse(storedState);
   }
 }
+console.log(PersistableMemoryDatabse);
 
 // const myDB = new InMemoryDatabase();
 // console.log(myDB);
@@ -49,15 +59,17 @@ class PersistableMemoryDatabse extends InMemoryDatabase implements Persistable {
 
 // console.log(myDB.get('foo'));
 
-const persistenDb = new PersistableMemoryDatabse();
+const persistenDb = new PersistableMemoryDatabse<number, string>();
 console.log(persistenDb);
-persistenDb.set('foo', 'bar');
+persistenDb.set('foo', 1);
 console.log(persistenDb.get('foo'));
 console.log(persistenDb.saveToString());
 const save = persistenDb.saveToString();
-persistenDb.set('foo', 'db1-baz');
+// persistenDb.set('foo', 'db1-baz');
+//provide geniric type for Class so that it can accept the type when create new object
+persistenDb.set('foo', 3);
 console.log(persistenDb.get('foo'));
 
-const myDb2 = new PersistableMemoryDatabse();
+const myDb2 = new PersistableMemoryDatabse<number, string>();
 myDb2.restoreFromString(save);
 console.log(myDb2.get('foo'));
